@@ -28,7 +28,7 @@ import java.util.List;
  *
  */
 @SuppressWarnings("unchecked")
-public class Driver3
+public class Driver1
 {
     public static void main(String[] args) throws Exception
     {
@@ -36,7 +36,7 @@ public class Driver3
         String projectPath = "/usr/app/joanaTaintAnalysis/";
         String path = projectPath + "target/test-classes" + ":" + projectPath + "lib/servlet-api.jar";
 
-        JavaMethodSignature entryPoint = JavaMethodSignature.fromString("samples.Sample2" + (".doGet([Ljava/lang/String;)V"));
+        JavaMethodSignature entryPoint = JavaMethodSignature.mainMethodOfClass("samples.Sample1");
         SDGConfig config = new SDGConfig(path, entryPoint.toBCString(), Stubs.JRE_17);
 
         config.setComputeInterferences(true);
@@ -56,8 +56,8 @@ public class Driver3
         // analysis.addAnnotation(new IFCAnnotation(AnnotationType.SOURCE, "high", context, source, UnknownCause.INSTANCE));
         // analysis.addAnnotation(new IFCAnnotation(AnnotationType.SINK, "low", context, sink, UnknownCause.INSTANCE));
 
-        analysis.addSourceAnnotation(program.getPart("samples.Sample2.source()Ljava/lang/String;"), BuiltinLattices.STD_SECLEVEL_HIGH);
-		analysis.addSinkAnnotation(program.getPart("samples.Sample2.sink(Ljava/lang/String;)V"), BuiltinLattices.STD_SECLEVEL_LOW);
+        analysis.addSourceAnnotation(program.getPart("samples.Sample1.source()Ljava/lang/String;"), BuiltinLattices.STD_SECLEVEL_HIGH);
+		analysis.addSinkAnnotation(program.getPart("samples.Sample1.sink(Ljava/lang/String;)V"), BuiltinLattices.STD_SECLEVEL_LOW);
 		
         Collection violations = analysis.doIFC();
 
