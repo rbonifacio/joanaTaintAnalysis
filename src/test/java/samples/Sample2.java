@@ -22,7 +22,7 @@ public class Sample2 {
     }
     
     public String getDescription() {
-        return "very simple sink";
+        return "very simple sink with custom main method";
     }
 
     public int getVulnerabilityCount() {
