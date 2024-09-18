@@ -49,13 +49,6 @@ public class Driver1
         // SDGSerializer.toPDGFormat(program.getSDG(), new FileOutputStream("yourSDGFile.pdg"));
         IFCAnalysis analysis = new IFCAnalysis(program);
 
-        // SDGMethod context = program.getMethod("securibench.micro.basic.Basic1.main([Ljava/lang/String;)V");
-        // SDGMethod source = program.getMethod("securibench.micro.basic.Basic1.source()Ljava/lang/String;");
-        // SDGMethod sink = program.getMethod("securibench.micro.basic.Basic1.sink(Ljava/lang/String;)V");
-
-        // analysis.addAnnotation(new IFCAnnotation(AnnotationType.SOURCE, "high", context, source, UnknownCause.INSTANCE));
-        // analysis.addAnnotation(new IFCAnnotation(AnnotationType.SINK, "low", context, sink, UnknownCause.INSTANCE));
-
         analysis.addSourceAnnotation(program.getPart("samples.Sample1.source()Ljava/lang/String;"), BuiltinLattices.STD_SECLEVEL_HIGH);
 		analysis.addSinkAnnotation(program.getPart("samples.Sample1.sink(Ljava/lang/String;)V"), BuiltinLattices.STD_SECLEVEL_LOW);
 		
