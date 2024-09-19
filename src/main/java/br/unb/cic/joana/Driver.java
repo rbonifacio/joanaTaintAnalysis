@@ -2,25 +2,24 @@ package br.unb.cic.joana;
 
 import com.ibm.wala.util.NullProgressMonitor;
 import edu.kit.joana.api.IFCAnalysis;
-import edu.kit.joana.api.annotations.AnnotationType;
-import edu.kit.joana.api.annotations.IFCAnnotation;
-import edu.kit.joana.api.annotations.cause.AnnotationCause;
-import edu.kit.joana.api.annotations.cause.JavaSourceAnnotation;
-import edu.kit.joana.api.annotations.cause.UnknownCause;
+import edu.kit.joana.api.lattice.BuiltinLattices;
 import edu.kit.joana.api.sdg.*;
 import edu.kit.joana.ifc.sdg.core.violations.IViolation;
 import edu.kit.joana.ifc.sdg.graph.SDGSerializer;
 import edu.kit.joana.ifc.sdg.mhpoptimization.MHPType;
 import edu.kit.joana.ifc.sdg.util.JavaMethodSignature;
-import edu.kit.joana.ifc.sdg.util.JavaType;
 import edu.kit.joana.util.Stubs;
 import edu.kit.joana.wala.core.SDGBuilder;
 import gnu.trove.map.TObjectIntMap;
 
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Hello world!
@@ -28,41 +27,110 @@ import java.util.List;
  */
 public class Driver
 {
-    public static void main(String[] args) throws Exception
-    {
-        //TODO: Make this flexible.
-        String path = "/Users/rbonifacio/Documents/workspace-java/JoanaTaintAnalysis/target/test-classes:/Users/rbonifacio/Documents/workspace-java/JoanaTaintAnalysis/lib/servlet-api.jar";
-        JavaMethodSignature entryPoint = JavaMethodSignature.mainMethodOfClass("securibench.micro.basic.Basic1");
-        SDGConfig config = new SDGConfig(path, entryPoint.toBCString(), Stubs.JRE_17);
+    private String applicationClassPath;
 
-        config.setThirdPartyLibsPath("/Users/rbonifacio/Documents/workspace-java/JoanaTaintAnalysis/lib/servlet-api.jar");
+    private String thirdPartyLibsPath;
+    private String entryPointMethod;
+    private List<String> sourceMethods;
+    private List<String> sinkMethods;
+    private SDGConfig config = null;
+
+    private String sdgFile = "sdg";
+
+    public Driver() {
+        sourceMethods = new ArrayList<>();
+        sinkMethods = new ArrayList<>();
+    }
+
+    public Driver(Config config) throws Exception {
+        this.applicationClassPath = absolutePath(config.getApplicationClassPath());
+        this.entryPointMethod = config.getEntryPointMethod();
+        this.thirdPartyLibsPath = String.join(":", config.getThirdPartyLibraries().stream().map(p -> absolutePath(p)).collect(Collectors.toList()));
+
+        System.out.println(this.thirdPartyLibsPath);
+
+        this.sourceMethods = config.getSourceMethods();
+        this.sinkMethods = config.getSinkMethods();
+    }
+    public void configure() {
+        //JavaMethodSignature entryPoint = JavaMethodSignature.mainMethodOfClass("securibench.micro.basic.Basic1");
+        JavaMethodSignature entryPoint = JavaMethodSignature.fromString(entryPointMethod);
+        config = new SDGConfig(applicationClassPath, entryPoint.toBCString(), Stubs.JRE_17);
+
+        config.setThirdPartyLibsPath(thirdPartyLibsPath);
         config.setComputeInterferences(true);
         config.setMhpType(MHPType.PRECISE);
         config.setPointsToPrecision(SDGBuilder.PointsToPrecision.INSTANCE_BASED);
         config.setExceptionAnalysis(SDGBuilder.ExceptionAnalysis.INTERPROC);
+    }
+
+    public List<String> execute() throws Exception {
+        if(config == null) {
+            throw new RuntimeException("Invalid configuration. Did you call the method `configure` before executing the analysis?");
+        }
 
         SDGProgram program = SDGProgram.createSDGProgram(config, System.out, new NullProgressMonitor());
-        SDGSerializer.toPDGFormat(program.getSDG(), new FileOutputStream("yourSDGFile.pdg"));
+        SDGSerializer.toPDGFormat(program.getSDG(), new FileOutputStream(sdgFile + ".pdg"));
         IFCAnalysis analysis = new IFCAnalysis(program);
 
-        SDGMethod context = program.getMethod("securibench.micro.basic.Basic1.main([Ljava/lang/String;)V");
-        SDGMethod source = program.getMethod("securibench.micro.basic.Basic1.source()Ljava/lang/String;");
-        SDGMethod sink = program.getMethod("securibench.micro.basic.Basic1.sink(Ljava/lang/String;)V");
+        for(String s: sourceMethods) {
+            analysis.addSourceAnnotation(program.getPart(s), BuiltinLattices.STD_SECLEVEL_HIGH);
+        }
 
-        analysis.addAnnotation(new IFCAnnotation(AnnotationType.SOURCE, "high", context, source, UnknownCause.INSTANCE));
-        analysis.addAnnotation(new IFCAnnotation(AnnotationType.SINK, "low", context, sink, UnknownCause.INSTANCE));
-
-
-        Collection violations = analysis.doIFC();
-        TObjectIntMap var7 = analysis.groupByPPPart(violations);
-
-        Iterator var8 = var7.keySet().iterator();
-
-        while(var8.hasNext()) {
-            IViolation var9 = (IViolation)var8.next();
-            System.out.println(var9);
+        for(String s: sinkMethods) {
+            analysis.addSinkAnnotation(program.getPart(s), BuiltinLattices.STD_SECLEVEL_LOW);
         }
 
 
+        Collection violations = analysis.doIFC();
+
+        List<String> results = new ArrayList<>();
+
+        TObjectIntMap map = analysis.groupByPPPart(violations);
+
+        Iterator it = map.keySet().iterator();
+
+        while(it.hasNext()) {
+            IViolation v = (IViolation)it.next();
+            results.add(v.toString());
+        }
+
+        return results;
+    }
+    public void setApplicationClassPath(String applicationClassPath) {
+        this.applicationClassPath = applicationClassPath;
+    }
+
+    public void setThirdPartyLibsPath(String thirdPartyLibsPath) {
+        this.thirdPartyLibsPath = thirdPartyLibsPath;
+    }
+
+    public void setEntryPointMethod(String entryPointMethod) {
+        this.entryPointMethod = entryPointMethod;
+    }
+
+    public void setSdgFile(String sdgFile) {
+        this.sdgFile = sdgFile;
+    }
+
+    public void addSourceMethod(String sourceMethod) {
+        this.sourceMethods.add(sourceMethod);
+    }
+
+    public void addSinkMethod(String sinkMethod) {
+        this.sinkMethods.add(sinkMethod);
+    }
+
+    private String absolutePath(String path) {
+        if(path.startsWith("~/")) {
+            path = path.replace("~", System.getProperty("user.home"));
+        }
+
+        File f = new File(path);
+
+        if(! f.exists()) {
+            throw new RuntimeException("File " + path + " does not exist");
+        }
+        return f.getAbsolutePath();
     }
 }

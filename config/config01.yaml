@@ -1,0 +1,8 @@
+applicationClassPath: ./target/test-classes
+entryPointMethod: securibench.micro.basic.Basic1.main([Ljava/lang/String;)V
+thirdPartyLibraries:
+  - ./lib/servlet-api.jar
+sourceMethods:
+  - securibench.micro.basic.Basic1.source()Ljava/lang/String;
+sinkMethods:
+  - securibench.micro.basic.Basic1.sink(Ljava/lang/String;)V
