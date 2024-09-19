@@ -46,9 +46,6 @@ public class Driver
         this.applicationClassPath = absolutePath(config.getApplicationClassPath());
         this.entryPointMethod = config.getEntryPointMethod();
         this.thirdPartyLibsPath = String.join(":", config.getThirdPartyLibraries().stream().map(p -> absolutePath(p)).collect(Collectors.toList()));
-
-        System.out.println(this.thirdPartyLibsPath);
-
         this.sourceMethods = config.getSourceMethods();
         this.sinkMethods = config.getSinkMethods();
     }
