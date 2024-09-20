@@ -45,11 +45,6 @@ public abstract class JoanaTestCase extends TestCase {
 
     @Test
     public void testExecution() throws Exception {
-        try {
-            Assert.assertEquals(expectedViolations(), driver.execute().size());
-        }
-        catch (Throwable e) {
-            Assert.fail("Error running the test case: " + e.getMessage());
-        }
+        Assert.assertEquals(expectedViolations(), driver.execute().size());
     }
 }

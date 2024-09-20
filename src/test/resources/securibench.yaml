@@ -3,6 +3,7 @@ entryPointMethod: ignore
 thirdPartyLibraries:
   - ~/.m2/repository/javax/servlet-api/2.5/servlet-api-2.5.jar
 sourceMethods:
-  - securibench.micro.basic.Basic1.source()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequest.getParameter(Ljava/lang/String;)Ljava/lang/String;
+  - javax.servlet.ServletRequestWrapper.getParameter(Ljava/lang/String;)Ljava/lang/String;
 sinkMethods:
-  - securibench.micro.basic.Basic1.sink(Ljava/lang/String;)V
+  - java.io.PrintWriter.println(Ljava/lang/String;)V

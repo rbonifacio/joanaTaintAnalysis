@@ -8,6 +8,7 @@ import edu.kit.joana.ifc.sdg.core.violations.IViolation;
 import edu.kit.joana.ifc.sdg.graph.SDGSerializer;
 import edu.kit.joana.ifc.sdg.mhpoptimization.MHPType;
 import edu.kit.joana.ifc.sdg.util.JavaMethodSignature;
+import edu.kit.joana.ui.annotations.PruningPolicy;
 import edu.kit.joana.util.Stubs;
 import edu.kit.joana.wala.core.SDGBuilder;
 import gnu.trove.map.TObjectIntMap;
@@ -67,15 +68,22 @@ public class Driver
         }
 
         SDGProgram program = SDGProgram.createSDGProgram(config, System.out, new NullProgressMonitor());
+
         SDGSerializer.toPDGFormat(program.getSDG(), new FileOutputStream(sdgFile + ".pdg"));
         IFCAnalysis analysis = new IFCAnalysis(program);
 
         for(String s: sourceMethods) {
-            analysis.addSourceAnnotation(program.getPart(s), BuiltinLattices.STD_SECLEVEL_HIGH);
+            SDGProgramPart p = program.getPart(s);
+            if(p != null) {
+                analysis.addSourceAnnotation(p, BuiltinLattices.STD_SECLEVEL_HIGH);
+            }
         }
 
         for(String s: sinkMethods) {
-            analysis.addSinkAnnotation(program.getPart(s), BuiltinLattices.STD_SECLEVEL_LOW);
+            SDGProgramPart p = program.getPart(s);
+            if(p != null) {
+                analysis.addSinkAnnotation(program.getPart(s), BuiltinLattices.STD_SECLEVEL_LOW);
+            }
         }
 
 

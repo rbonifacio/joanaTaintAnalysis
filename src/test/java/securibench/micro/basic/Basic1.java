@@ -17,21 +17,11 @@ import securibench.micro.MicroTestCase;
  *  @servlet vuln_count = "1" 
  *  */
 public class Basic1 extends BasicTestCase implements MicroTestCase {
-    public static void main(String[] args) {
-        try {
-            String str = source();
-            sink(str);    /* BAD */
-        }catch(Exception e) {
-
-        }
-    }
-
-    private static String source() {
-        return "secret";
-    }
-
-    private static void sink(String v) {
-
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String str = req.getParameter("name");
+        PrintWriter writer = resp.getWriter();
+        
+        writer.println(str);    /* BAD */
     }
     
     public String getDescription() {
