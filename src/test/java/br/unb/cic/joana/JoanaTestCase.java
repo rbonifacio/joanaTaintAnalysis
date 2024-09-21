@@ -6,17 +6,20 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import securibench.micro.MicroTestCase;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class JoanaTestCase extends TestCase {
 
-    public abstract String entryPoint();
     public abstract String configurationFile();
-    public abstract int expectedViolations();
 
-    private Config loadConfiguration() throws Exception {
+    private Config loadConfiguration(String entryPointMethod) throws Exception {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
 
@@ -29,22 +32,18 @@ public abstract class JoanaTestCase extends TestCase {
 
         /* we override the application class path and the entrypoint. */
         config.setApplicationClassPath(applicationClassPath.getAbsolutePath());
-        config.setEntryPointMethod(entryPoint());
+        config.setEntryPointMethod(entryPointMethod);
 
         List<String> thirdPartyLibraries = config.getThirdPartyLibraries();
 
         return config;
     }
     protected Driver driver;
-    @Before
-    public void setUp() throws Exception {
-        Config config = loadConfiguration();
+
+    public void setUpConfiguration(String entryPointMethod) throws Exception {
+        Config config = loadConfiguration(entryPointMethod);
         driver = new Driver(config);
         driver.configure();
     }
 
-    @Test
-    public void testExecution() throws Exception {
-        Assert.assertEquals(expectedViolations(), driver.execute().size());
-    }
 }
