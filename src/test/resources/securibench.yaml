@@ -1,7 +1,7 @@
 applicationClassPath: ignore
 entryPointMethod: ignore
 thirdPartyLibraries:
-  - ~/.m2/repository/javax/servlet-api/2.5/servlet-api-2.5.jar
+  - ~/.m2/repository/javax/servlet/javax.servlet-api/3.0.1/javax.servlet-api-3.0.1.jar
 sourceMethods:
   - javax.servlet.http.HttpServletRequest.getParameter(Ljava/lang/String;)Ljava/lang/String;
   - javax.servlet.ServletRequestWrapper.getParameter(Ljava/lang/String;)Ljava/lang/String;
