@@ -41,10 +41,11 @@ public abstract class SecuriBenchTestCase extends JoanaTestCase {
 
         for(Class c: classes) {
             Object instance = c.newInstance();
-            if(instance instanceof MicroTestCase) {
+            if (instance instanceof MicroTestCase) {
                 MicroTestCase microTestCase = (MicroTestCase) instance;
                 int expected = microTestCase.getVulnerabilityCount();
                 int found = 0;
+                
                 try {
                     setUpConfiguration(c.getName() + "." + entryPointMethod());
                     found = driver.execute().size();
@@ -52,7 +53,8 @@ public abstract class SecuriBenchTestCase extends JoanaTestCase {
                     report.add(String.format("- %s failure to execute. Error = %s", c.getName(), e.getMessage()));
                     failure = true;
                 }
-                if(expected == found) {
+
+                if (expected == found) {
                     report.add(String.format(" - %s (ok)", c.getName()));
                 }
                 else {
@@ -70,13 +72,15 @@ public abstract class SecuriBenchTestCase extends JoanaTestCase {
         for(String s: report) {
             System.out.println(s);
         }
-        if(totalOfExpectedVulnerabilities == totalOfVulnerabilitiesFound) {
+
+        if (totalOfExpectedVulnerabilities == totalOfVulnerabilitiesFound) {
             Assert.assertTrue(true);
         }
         else {
             System.err.println(String.format("Error. Expecting %d but found %d warnings.", totalOfExpectedVulnerabilities, totalOfVulnerabilitiesFound));
         }
-        if(failure) {
+
+        if (failure) {
             System.err.println("We found errors in the Joana execution or configuration.");
         }
     }
