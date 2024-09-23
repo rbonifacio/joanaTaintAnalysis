@@ -38,6 +38,7 @@ public abstract class JoanaTestCase extends TestCase {
 
         return config;
     }
+
     protected Driver driver;
 
     public void setUpConfiguration(String entryPointMethod) throws Exception {
@@ -45,5 +46,4 @@ public abstract class JoanaTestCase extends TestCase {
         driver = new Driver(config);
         driver.configure();
     }
-
 }
