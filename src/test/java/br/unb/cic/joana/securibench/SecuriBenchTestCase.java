@@ -24,13 +24,13 @@ public abstract class SecuriBenchTestCase extends JoanaTestCase {
 
     public abstract String basePackage();
 
-    private Set<Class<? extends MicroTestCase>> findClassesInBasePackage() {
+    protected Set<Class<? extends MicroTestCase>> findClassesInBasePackage() {
         Reflections reflections = new Reflections(basePackage(), new SubTypesScanner(false));
         return reflections.getSubTypesOf(MicroTestCase.class).stream().collect(Collectors.toSet());
     }
 
     @Test
-    public void testSuite() throws Exception {
+    public final void testSuite() throws Exception {
         Set<Class<? extends MicroTestCase>> classes = findClassesInBasePackage();
 
         int totalOfExpectedVulnerabilities = 0;
