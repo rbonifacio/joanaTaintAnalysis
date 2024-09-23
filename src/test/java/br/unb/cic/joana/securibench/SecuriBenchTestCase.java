@@ -39,33 +39,33 @@ public abstract class SecuriBenchTestCase extends JoanaTestCase {
 
         boolean failure = false;
 
-        for(Class c: classes) {
+        for (Class c: classes) {
             Object instance = c.newInstance();
-            if (instance instanceof MicroTestCase) {
-                MicroTestCase microTestCase = (MicroTestCase) instance;
-                int expected = microTestCase.getVulnerabilityCount();
-                int found = 0;
-                
-                try {
-                    setUpConfiguration(c.getName() + "." + entryPointMethod());
-                    found = driver.execute().size();
-                } catch(Throwable e) {
-                    report.add(String.format("- %s failure to execute. Error = %s", c.getName(), e.getMessage()));
-                    failure = true;
-                }
 
-                if (expected == found) {
-                    report.add(String.format(" - %s (ok)", c.getName()));
-                }
-                else {
-                    report.add(String.format("- %s error. Expecting %d but found %d vulnerabilities.", c.getName(), expected, found));
-                }
-                totalOfExpectedVulnerabilities += expected;
-                totalOfVulnerabilitiesFound += found;
-            }
-            else {
+            if (! (instance instanceof MicroTestCase)) {
                 throw new RuntimeException("Could not instantiate " + c.getName() + " as a MicroTestCase");
             }
+
+            MicroTestCase microTestCase = (MicroTestCase) instance;
+            int expected = microTestCase.getVulnerabilityCount();
+            int found = 0;
+            
+            try {
+                setUpConfiguration(c.getName() + "." + entryPointMethod());
+                found = driver.execute().size();
+            } catch(Throwable e) {
+                report.add(String.format("- %s failure to execute. Error = %s", c.getName(), e.getMessage()));
+                failure = true;
+            }
+
+            if (expected == found) {
+                report.add(String.format(" - %s (ok)", c.getName()));
+            }
+            else {
+                report.add(String.format("- %s error. Expecting %d but found %d vulnerabilities.", c.getName(), expected, found));
+            }
+            totalOfExpectedVulnerabilities += expected;
+            totalOfVulnerabilitiesFound += found;
         }
 
         Collections.sort(report);
