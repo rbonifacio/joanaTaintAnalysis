@@ -16,18 +16,10 @@ import gnu.trove.map.TObjectIntMap;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Hello world!
- *
- */
-public class Driver
-{
+public class Driver {
     private String applicationClassPath;
 
     private String thirdPartyLibsPath;
@@ -50,6 +42,7 @@ public class Driver
         this.sourceMethods = config.getSourceMethods();
         this.sinkMethods = config.getSinkMethods();
     }
+
     public void configure() {
         //JavaMethodSignature entryPoint = JavaMethodSignature.mainMethodOfClass("securibench.micro.basic.Basic1");
         JavaMethodSignature entryPoint = JavaMethodSignature.fromString(entryPointMethod);
@@ -58,30 +51,31 @@ public class Driver
         config.setThirdPartyLibsPath(thirdPartyLibsPath);
         config.setComputeInterferences(true);
         config.setMhpType(MHPType.PRECISE);
-        config.setPointsToPrecision(SDGBuilder.PointsToPrecision.INSTANCE_BASED);
+        config.setPointsToPrecision(SDGBuilder.PointsToPrecision.OBJECT_SENSITIVE);
         config.setExceptionAnalysis(SDGBuilder.ExceptionAnalysis.INTERPROC);
+        config.setFieldPropagation(SDGBuilder.FieldPropagation.OBJ_GRAPH);
     }
 
     public List<String> execute() throws Exception {
-        if(config == null) {
+        if (config == null) {
             throw new RuntimeException("Invalid configuration. Did you call the method `configure` before executing the analysis?");
         }
 
         SDGProgram program = SDGProgram.createSDGProgram(config, System.out, new NullProgressMonitor());
-
-        SDGSerializer.toPDGFormat(program.getSDG(), new FileOutputStream(sdgFile + ".pdg"));
         IFCAnalysis analysis = new IFCAnalysis(program);
 
-        for(String s: sourceMethods) {
+        Collection<SDGClass> classes = program.getClasses();
+
+        for (String s : sourceMethods) {
             SDGProgramPart p = program.getPart(s);
-            if(p != null) {
+            if (p != null) {
                 analysis.addSourceAnnotation(p, BuiltinLattices.STD_SECLEVEL_HIGH);
             }
         }
 
-        for(String s: sinkMethods) {
+        for (String s : sinkMethods) {
             SDGProgramPart p = program.getPart(s);
-            if(p != null) {
+            if (p != null) {
                 analysis.addSinkAnnotation(program.getPart(s), BuiltinLattices.STD_SECLEVEL_LOW);
             }
         }
@@ -95,13 +89,14 @@ public class Driver
 
         Iterator it = map.keySet().iterator();
 
-        while(it.hasNext()) {
-            IViolation v = (IViolation)it.next();
+        while (it.hasNext()) {
+            IViolation v = (IViolation) it.next();
             results.add(v.toString());
         }
 
         return results;
     }
+
     public void setApplicationClassPath(String applicationClassPath) {
         this.applicationClassPath = applicationClassPath;
     }
@@ -127,13 +122,13 @@ public class Driver
     }
 
     private String absolutePath(String path) {
-        if(path.startsWith("~/")) {
+        if (path.startsWith("~/")) {
             path = path.replace("~", System.getProperty("user.home"));
         }
 
         File f = new File(path);
 
-        if(! f.exists()) {
+        if (!f.exists()) {
             throw new RuntimeException("File " + path + " does not exist");
         }
         return f.getAbsolutePath();

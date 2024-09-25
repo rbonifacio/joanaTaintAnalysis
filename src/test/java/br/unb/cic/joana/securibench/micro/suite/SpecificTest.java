@@ -1,15 +1,12 @@
 package br.unb.cic.joana.securibench.micro.suite;
 
-import br.unb.cic.joana.JoanaTestCase;
 import br.unb.cic.joana.securibench.SecuriBenchTestCase;
 import securibench.micro.MicroTestCase;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
-public class Basic16 extends SecuriBenchTestCase {
+public class SpecificTest extends SecuriBenchTestCase {
     @Override
     public String basePackage() {
         return "securibench.micro.basic";
@@ -23,7 +20,7 @@ public class Basic16 extends SecuriBenchTestCase {
     @Override
     protected Set<Class<? extends MicroTestCase>> findClassesInBasePackage() {
         try {
-            Class c = Class.forName("securibench.micro.basic.Basic16");
+            Class c = Class.forName("securibench.micro.basic.Basic42");
             Set<Class<? extends MicroTestCase>> res = new HashSet<>();
             res.add(c);
             return res;
