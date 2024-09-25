@@ -1,6 +1,7 @@
 package br.unb.cic.joana.securibench;
 
 import br.unb.cic.joana.JoanaTestCase;
+import br.unb.cic.joana.Metrics;
 import org.junit.Assert;
 import org.junit.Test;
 import org.reflections.Reflections;
@@ -39,6 +40,8 @@ public abstract class SecuriBenchTestCase extends JoanaTestCase {
 
         boolean failure = false;
 
+        Metrics m = Metrics.getInstance();
+
         for (Class c: classes) {
             Object instance = c.newInstance();
 
@@ -60,9 +63,17 @@ public abstract class SecuriBenchTestCase extends JoanaTestCase {
 
             if (expected == found) {
                 report.add(String.format(" - %s (ok)", c.getName()));
+                m.reportTruePositives(expected);
             }
             else {
                 report.add(String.format("- %s error. Expecting %d but found %d vulnerabilities.", c.getName(), expected, found));
+
+                if(expected > found) {
+                    m.reportFalseNegatives(expected - found);
+                }
+                else {
+                    m.reportFalsePositives(found - expected);
+                }
             }
             totalOfExpectedVulnerabilities += expected;
             totalOfVulnerabilitiesFound += found;
@@ -79,6 +90,8 @@ public abstract class SecuriBenchTestCase extends JoanaTestCase {
         else {
             System.err.println(String.format("Error. Expecting %d but found %d warnings.", totalOfExpectedVulnerabilities, totalOfVulnerabilitiesFound));
         }
+
+        System.out.println(String.format("precision = %.2f recall = %.2f fScore = %.2f", m.precision(), m.recall(), m.f1Score()));
 
         if (failure) {
             System.err.println("We found errors in the Joana execution or configuration.");
