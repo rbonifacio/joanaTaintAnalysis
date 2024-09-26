@@ -2,8 +2,40 @@ applicationClassPath: ignore
 entryPointMethod: ignore
 thirdPartyLibraries:
   - ~/.m2/repository/javax/servlet/javax.servlet-api/3.0.1/javax.servlet-api-3.0.1.jar
+  - ~/.m2/repository/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar
 sourceMethods:
   - javax.servlet.http.HttpServletRequest.getParameter(Ljava/lang/String;)Ljava/lang/String;
   - javax.servlet.ServletRequestWrapper.getParameter(Ljava/lang/String;)Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequest.getCookies()[Ljavax/servlet/http/Cookie;
+  - javax.servlet.ServletRequestWrapper.getCookies()[Ljavax/servlet/http/Cookie;
+  - javax.servlet.http.HttpServletRequest.getHeader(Ljava/lang/String;)Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequestWrapper.getHeader(Ljava/lang/String;)Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequest.getHeaderNames()Ljava/util/Enumeration;
+  - javax.servlet.http.HttpServletRequestWrapper.getHeaderNames()Ljava/util/Enumeration;
+  - javax.servlet.http.HttpServletRequest.getProtocol()Ljava/lang/String;
+  - javax.servlet.ServletRequestWrapper.getProtocol()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequest.getScheme()Ljava/lang/String;
+  - javax.servlet.ServletRequestWrapper.getScheme()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequest.getAuthType()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequestWrapper.getAuthType()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequest.getQueryString()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequestWrapper.getQueryString()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequest.getRemoteUser()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequestWrapper.getRemoteUser()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequest.getRequestURL()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequestWrapper.getRequestURL()Ljava/lang/String;
+  - javax.servlet.http.HttpServletRequest.getInputStream()Ljavax/servlet/ServletInputStream;
+  - javax.servlet.ServletRequestWrapper.getInputStream()Ljavax/servlet/ServletInputStream;
+  - javax.servlet.ServletConfig.getInitParameter(Ljava/lang/String;)Ljava/lang/String;
+  - securibench.supportClasses.DummyServletContext.getInitParameter(Ljava/lang/String;)Ljava/lang/String;
+  - securibench.supportClasses.DummyServletContext.getInitParameterNames()Ljava/util/Enumeration;
+
 sinkMethods:
   - java.io.PrintWriter.println(Ljava/lang/String;)V
+  - java.io.File.createNewFile()Z
+  - java.io.FileWriter.<init>(Ljava/lang/String;)V
+  - java.io.FileInputStream.<init>(Ljava/lang/String;)V
+  - javax.servlet.http.HttpServletResponse.sendRedirect(Ljava/lang/String;)V
+  - javax.servlet.http.HttpServletResponseWrapper.sendRedirect(Ljava/lang/String;)V
+  - java.sql.Connection.prepareStatement(Ljava/lang/String;)Ljava/sql/PreparedStatement;
+  - com.mysql.cj.jdbc.ConnectionImpl.prepareStatement(Ljava/lang/String;)Ljava/sql/PreparedStatement;
